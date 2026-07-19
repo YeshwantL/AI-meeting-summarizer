@@ -24,13 +24,31 @@ def transcribe(path: Path) -> str:
 
 def summarize(text: str) -> str:
     sentences = re.split(r"(?<=[.!?])\s+", text.strip())
-    if len(text.split()) < 80 or summary_model() is None: return " ".join(sentences[:5])[:1600]
-    words = text.split(); parts = []
-    for i in range(0, len(words), 700):
-        out = summary_model()(" ".join(words[i:i+700]), max_length=180, min_length=35, do_sample=False)
-        parts.append(out[0]["summary_text"])
-    return " ".join(parts)
+    if len(text.split()) < 80 or summary_model() is None:
+        selected = sentences[:2]
+    else:
+        words = text.split(); parts = []
+        for i in range(0, len(words), 700):
+            out = summary_model()(" ".join(words[i:i+700]), max_length=90, min_length=25, do_sample=False)
+            parts.append(out[0]["summary_text"])
+        combined = " ".join(parts)
+        if len(combined.split()) > 140:
+            combined = summary_model()(combined, max_length=110, min_length=35, do_sample=False)[0]["summary_text"]
+        selected = re.split(r"(?<=[.!?])\s+", combined)[:5]
 
+    points = []
+    word_count = 0
+    for sentence in selected:
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+        remaining = 120 - word_count
+        if remaining <= 0:
+            break
+        sentence_words = sentence.split()[:remaining]
+        points.append("• " + " ".join(sentence_words))
+        word_count += len(sentence_words)
+    return "\n".join(points)
 def extract_actions(text: str) -> list[dict]:
     trigger = re.compile(r"\b(will|must|should|needs? to|action item|follow up|todo|assigned to)\b", re.I)
     owner = re.compile(r"(?:^|[.!?]\s+)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:will|must|should|needs? to)\b")
