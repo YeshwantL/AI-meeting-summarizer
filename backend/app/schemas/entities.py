@@ -2,7 +2,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 class TaskRead(BaseModel):
     id: int; meeting_id: int; task: str; owner: str | None = None; deadline: str | None = None
-    priority: str = "Medium"; completed: bool = False
+    priority: str = "Medium"; confidence: int = 0; reason: str | None = None; completed: bool = False
     model_config = ConfigDict(from_attributes=True)
 class TaskUpdate(BaseModel): completed: bool
 class MeetingCreate(BaseModel):

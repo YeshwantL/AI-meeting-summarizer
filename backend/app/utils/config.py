@@ -11,10 +11,11 @@ class Settings(BaseSettings):
     app_name: str = "AI Meeting Summarizer"
     database_url: str = f"sqlite:///{BASE_DIR / 'meetings.db'}"
     upload_dir: Path = BASE_DIR / "uploads"
-    max_upload_mb: int = 250
+    max_upload_mb: int = 1000
     whisper_model: str = "base"
     summarizer_model: str = "facebook/bart-large-cnn"
     enable_ai_models: bool = True
+    action_confidence_threshold: int = 72
     cors_origins: str = "http://localhost:5173"
 
     model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", extra="ignore")
