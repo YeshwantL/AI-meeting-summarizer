@@ -10,11 +10,11 @@ from app.services.meeting_service import create_meeting, get_meeting, list_meeti
 from app.utils.config import settings
 
 router=APIRouter()
-ALLOWED={".mp3",".wav",".mp4",".txt"}
+ALLOWED={".mp3",".wav",".mp4",".mov",".mkv",".webm",".m4v",".txt"}
 @router.post("/upload", response_model=MeetingDetail, status_code=201)
 def upload(title: str=Form(...), file: UploadFile=File(...), db: Session=Depends(get_db)):
     suffix=Path(file.filename or "").suffix.lower()
-    if suffix not in ALLOWED: raise HTTPException(400,"Supported files: MP3, WAV, MP4, TXT")
+    if suffix not in ALLOWED: raise HTTPException(400,"Supported files: MP3, WAV, MP4, MOV, MKV, WEBM, M4V, TXT")
     settings.upload_dir.mkdir(parents=True,exist_ok=True); path=settings.upload_dir/f"{uuid.uuid4()}{suffix}"
     with path.open("wb") as target: shutil.copyfileobj(file.file,target)
     try:
